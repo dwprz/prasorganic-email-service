@@ -1,0 +1,31 @@
+package config
+
+import (
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+)
+
+func setUpForDevelopment(logger *logrus.Logger) *Config {
+	viper := viper.New()
+
+	viper.SetConfigFile(".env")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		logger.WithFields(logrus.Fields{"location": "config.setUpForDevelopment", "section": "viper.ReadInConfig"}).Fatal(err)
+	}
+
+	oauthConf := new(oauth)
+	oauthConf.ClientId = viper.GetString("OAUTH_CLIENT_ID")
+	oauthConf.ClientSecret = viper.GetString("OAUTH_CLIENT_SECRET")
+	oauthConf.RefreshToken = viper.GetString("OAUTH_REFRESH_TOKEN")
+
+	rabbitMQConf := new(rabbitMQEmailService)
+	rabbitMQConf.DSN = viper.GetString("RABBITMQ_EMAIL_SERVICE_DSN")
+
+	return &Config{
+		Oauth:    oauthConf,
+		RabbitMQEmailService: rabbitMQConf,
+	}
+}
