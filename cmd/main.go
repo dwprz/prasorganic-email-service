@@ -6,10 +6,11 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
 	"github.com/dwprz/prasorganic-email-service/src/common/logger"
 	"github.com/dwprz/prasorganic-email-service/src/core/broker"
 	"github.com/dwprz/prasorganic-email-service/src/infrastructure/config"
-	"github.com/dwprz/prasorganic-email-service/src/infrastructure/gmail"
+	"github.com/dwprz/prasorganic-email-service/src/infrastructure/oauth"
 	"github.com/dwprz/prasorganic-email-service/src/service"
 )
 
@@ -32,7 +33,7 @@ func main() {
 	appStatus := os.Getenv("PRASORGANIC_APP_STATUS")
 	conf := config.New(appStatus, logger)
 
-	gmailService := gmail.NewService(conf, logger)
+	gmailService := oauth.NewGmailService(conf, logger)
 	emailService := service.NewEmail(gmailService, logger)
 
 	rabbitMQClient := broker.NewRabbitMQClient(emailService, conf, logger)

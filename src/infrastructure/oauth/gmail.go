@@ -1,4 +1,4 @@
-package gmail
+package oauth
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func NewService(conf *config.Config, logger *logrus.Logger) *gmail.Service {
+func NewGmailService(conf *config.Config, logger *logrus.Logger) *gmail.Service {
 	ctx := context.Background()
 
 	oauthConf := &oauth2.Config{

@@ -17,9 +17,9 @@ func setUpForDevelopment(logger *logrus.Logger) *Config {
 	}
 
 	oauthConf := new(oauth)
-	oauthConf.ClientId = viper.GetString("OAUTH_CLIENT_ID")
-	oauthConf.ClientSecret = viper.GetString("OAUTH_CLIENT_SECRET")
-	oauthConf.RefreshToken = viper.GetString("OAUTH_REFRESH_TOKEN")
+	oauthConf.ClientId = viper.GetString("GMAIL_OAUTH_CLIENT_ID")
+	oauthConf.ClientSecret = viper.GetString("GMAIL_OAUTH_CLIENT_SECRET")
+	oauthConf.RefreshToken = viper.GetString("GMAIL_OAUTH_REFRESH_TOKEN")
 
 	rabbitMQConf := new(rabbitMQEmailService)
 	rabbitMQConf.DSN = viper.GetString("RABBITMQ_EMAIL_SERVICE_DSN")

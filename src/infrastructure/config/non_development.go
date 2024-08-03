@@ -20,7 +20,7 @@ func setUpForNonDevelopment(appStatus string, logger *logrus.Logger) *Config {
 	client.SetToken(os.Getenv("PRASORGANIC_CONFIG_TOKEN"))
 	mountPath := "prasorganic-secrets" + "-" + strings.ToLower(appStatus)
 
-	emailServiceSecrets, err := client.KVv2(mountPath).Get(context.Background(), "email-service")
+	oauthSecrets, err := client.KVv2(mountPath).Get(context.Background(), "oauth")
 	if err != nil {
 		logger.WithFields(logrus.Fields{"location": "config.setUpForNonDevelopment", "section": "KVv2.Get"}).Fatal(err)
 	}
@@ -31,9 +31,9 @@ func setUpForNonDevelopment(appStatus string, logger *logrus.Logger) *Config {
 	}
 
 	oauthConf := new(oauth)
-	oauthConf.ClientId = emailServiceSecrets.Data["OAUTH_CLIENT_ID"].(string)
-	oauthConf.ClientSecret = emailServiceSecrets.Data["OAUTH_CLIENT_SECRET"].(string)
-	oauthConf.RefreshToken = emailServiceSecrets.Data["OAUTH_REFRESH_TOKEN"].(string)
+	oauthConf.ClientId = oauthSecrets.Data["GMAIL_CLIENT_ID"].(string)
+	oauthConf.ClientSecret = oauthSecrets.Data["GMAIL_CLIENT_SECRET"].(string)
+	oauthConf.RefreshToken = oauthSecrets.Data["GMAIL_REFRESH_TOKEN"].(string)
 
 	rabbitMQEmailServiceConf := new(rabbitMQEmailService)
 	rabbitMQEmailServiceConf.DSN = rabbitMQEmailServiceSecrets.Data["DSN"].(string)
