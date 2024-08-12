@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/sirupsen/logrus"
+	"os"
 )
 
 type oauth struct {
@@ -19,15 +19,17 @@ type Config struct {
 	RabbitMQEmailService *rabbitMQEmailService
 }
 
-func New(appStatus string, logger *logrus.Logger) *Config {
-	var config *Config
+var Conf *Config
+
+// *config ini hanya berisi env variable
+func init() {
+	appStatus := os.Getenv("PRASORGANIC_APP_STATUS")
 
 	if appStatus == "DEVELOPMENT" {
 
-		config = setUpForDevelopment(logger)
-		return config
+		Conf = setUpForDevelopment()
+		return
 	}
 
-	config = setUpForNonDevelopment(appStatus, logger)
-	return config
+	Conf = setUpForNonDevelopment(appStatus)
 }

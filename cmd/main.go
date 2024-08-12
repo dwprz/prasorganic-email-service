@@ -5,11 +5,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/dwprz/prasorganic-email-service/src/common/logger"
 	"github.com/dwprz/prasorganic-email-service/src/core/broker"
-	"github.com/dwprz/prasorganic-email-service/src/infrastructure/config"
 	"github.com/dwprz/prasorganic-email-service/src/infrastructure/oauth"
 	"github.com/dwprz/prasorganic-email-service/src/service"
 )
@@ -27,16 +24,11 @@ func HandleCloseApp(cancel context.CancelFunc) {
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	HandleCloseApp(cancel)
-	defer time.Sleep(5 * time.Second)
 
-	logger := logger.New()
-	appStatus := os.Getenv("PRASORGANIC_APP_STATUS")
-	conf := config.New(appStatus, logger)
+	gmailService := oauth.NewGmailService()
+	emailService := service.NewEmail(gmailService)
 
-	gmailService := oauth.NewGmailService(conf, logger)
-	emailService := service.NewEmail(gmailService, logger)
-
-	rabbitMQClient := broker.NewRabbitMQClient(emailService, conf, logger)
+	rabbitMQClient := broker.NewRabbitMQClient(emailService)
 
 	go func() {
 		defer rabbitMQClient.Close()

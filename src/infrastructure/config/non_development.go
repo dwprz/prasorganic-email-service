@@ -2,19 +2,21 @@ package config
 
 import (
 	"context"
-	vault "github.com/hashicorp/vault/api"
-	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
+
+	"github.com/dwprz/prasorganic-email-service/src/common/log"
+	vault "github.com/hashicorp/vault/api"
+	"github.com/sirupsen/logrus"
 )
 
-func setUpForNonDevelopment(appStatus string, logger *logrus.Logger) *Config {
+func setUpForNonDevelopment(appStatus string) *Config {
 	vaultConf := vault.DefaultConfig()
 	vaultConf.Address = os.Getenv("PRASORGANIC_CONFIG_ADDRESS")
 
 	client, err := vault.NewClient(vaultConf)
 	if err != nil {
-		logger.Fatalf("vault new client: %v", err)
+		log.Logger.Fatalf("vault new client: %v", err)
 	}
 
 	client.SetToken(os.Getenv("PRASORGANIC_CONFIG_TOKEN"))
@@ -22,12 +24,12 @@ func setUpForNonDevelopment(appStatus string, logger *logrus.Logger) *Config {
 
 	oauthSecrets, err := client.KVv2(mountPath).Get(context.Background(), "oauth")
 	if err != nil {
-		logger.WithFields(logrus.Fields{"location": "config.setUpForNonDevelopment", "section": "KVv2.Get"}).Fatal(err)
+		log.Logger.WithFields(logrus.Fields{"location": "config.setUpForNonDevelopment", "section": "KVv2.Get"}).Fatal(err)
 	}
 
 	rabbitMQEmailServiceSecrets, err := client.KVv2(mountPath).Get(context.Background(), "rabbitmq-email-service")
 	if err != nil {
-		logger.WithFields(logrus.Fields{"location": "config.setUpForNonDevelopment", "section": "KVv2.Get"}).Fatal(err)
+		log.Logger.WithFields(logrus.Fields{"location": "config.setUpForNonDevelopment", "section": "KVv2.Get"}).Fatal(err)
 	}
 
 	oauthConf := new(oauth)

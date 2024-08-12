@@ -2,6 +2,8 @@ package oauth
 
 import (
 	"context"
+
+	"github.com/dwprz/prasorganic-email-service/src/common/log"
 	"github.com/dwprz/prasorganic-email-service/src/infrastructure/config"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -10,22 +12,22 @@ import (
 	"google.golang.org/api/option"
 )
 
-func NewGmailService(conf *config.Config, logger *logrus.Logger) *gmail.Service {
+func NewGmailService() *gmail.Service {
 	ctx := context.Background()
 
 	oauthConf := &oauth2.Config{
-		ClientID:     conf.Oauth.ClientId,
-		ClientSecret: conf.Oauth.ClientSecret,
+		ClientID:     config.Conf.Oauth.ClientId,
+		ClientSecret: config.Conf.Oauth.ClientSecret,
 		Endpoint:     google.Endpoint,
 		Scopes:       []string{gmail.GmailSendScope},
 	}
 
-	token := &oauth2.Token{RefreshToken: conf.Oauth.RefreshToken}
+	token := &oauth2.Token{RefreshToken: config.Conf.Oauth.RefreshToken}
 	tokenSource := oauthConf.TokenSource(ctx, token)
 
 	srvc, err := gmail.NewService(ctx, option.WithTokenSource(tokenSource))
 	if err != nil {
-		logger.WithFields(logrus.Fields{"location": "gmail.NewService", "section": "gmail.NewService"}).Error(err)
+		log.Logger.WithFields(logrus.Fields{"location": "oauth.NewGmailService", "section": "gmail.NewService"}).Error(err)
 	}
 
 	return srvc

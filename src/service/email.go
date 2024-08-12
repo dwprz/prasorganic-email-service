@@ -3,6 +3,8 @@ package service
 import (
 	"encoding/base64"
 	"encoding/json"
+
+	"github.com/dwprz/prasorganic-email-service/src/common/log"
 	"github.com/dwprz/prasorganic-email-service/src/model"
 	"github.com/dwprz/prasorganic-email-service/template"
 	"github.com/sirupsen/logrus"
@@ -15,13 +17,11 @@ type Email interface {
 
 type EmailImpl struct {
 	gmailService *gmail.Service
-	logger       *logrus.Logger
 }
 
-func NewEmail(gs *gmail.Service, l *logrus.Logger) Email {
+func NewEmail(gs *gmail.Service) Email {
 	return &EmailImpl{
 		gmailService: gs,
-		logger:       l,
 	}
 }
 
@@ -29,13 +29,13 @@ func (s *EmailImpl) SendOtp(data []byte) {
 	otpReq := new(model.OtpRequest)
 
 	if err := json.Unmarshal(data, otpReq); err != nil {
-		s.logger.WithFields(logrus.Fields{"location": "service.EmailImpl/SendOtp", "section": "json.Unmarshal"}).Error(err)
+		log.Logger.WithFields(logrus.Fields{"location": "service.EmailImpl/SendOtp", "section": "json.Unmarshal"}).Error(err)
 		return
 	}
 
 	m := new(gmail.Message)
 
-	tmpl := template.NewOtp(s.logger, otpReq.Otp)
+	tmpl := template.NewOtp(otpReq.Otp)
 
 	emailTo := "To: " + otpReq.Email + "\r\n"
 	subject := "Subject: " + "OTP Verification" + "\n"
@@ -45,6 +45,6 @@ func (s *EmailImpl) SendOtp(data []byte) {
 	m.Raw = base64.URLEncoding.EncodeToString(msg)
 
 	if _, err := s.gmailService.Users.Messages.Send("me", m).Do(); err != nil {
-		s.logger.WithFields(logrus.Fields{"location": "service.EmailImpl/SendOtp", "section": "gmail.Send"}).Error(err)
+		log.Logger.WithFields(logrus.Fields{"location": "service.EmailImpl/SendOtp", "section": "gmail.Send"}).Error(err)
 	}
 }

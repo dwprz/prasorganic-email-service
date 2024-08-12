@@ -1,11 +1,12 @@
 package config
 
 import (
+	"github.com/dwprz/prasorganic-email-service/src/common/log"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-func setUpForDevelopment(logger *logrus.Logger) *Config {
+func setUpForDevelopment() *Config {
 	viper := viper.New()
 
 	viper.SetConfigFile(".env")
@@ -13,7 +14,7 @@ func setUpForDevelopment(logger *logrus.Logger) *Config {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		logger.WithFields(logrus.Fields{"location": "config.setUpForDevelopment", "section": "viper.ReadInConfig"}).Fatal(err)
+		log.Logger.WithFields(logrus.Fields{"location": "config.setUpForDevelopment", "section": "viper.ReadInConfig"}).Fatal(err)
 	}
 
 	oauthConf := new(oauth)
