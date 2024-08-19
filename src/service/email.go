@@ -12,7 +12,7 @@ import (
 )
 
 type Email interface {
-	SendOtp(data []byte)
+	SendOtp(data []byte) error
 }
 
 type EmailImpl struct {
@@ -25,12 +25,12 @@ func NewEmail(gs *gmail.Service) Email {
 	}
 }
 
-func (s *EmailImpl) SendOtp(data []byte) {
+func (s *EmailImpl) SendOtp(data []byte) error {
 	otpReq := new(model.OtpRequest)
 
 	if err := json.Unmarshal(data, otpReq); err != nil {
 		log.Logger.WithFields(logrus.Fields{"location": "service.EmailImpl/SendOtp", "section": "json.Unmarshal"}).Error(err)
-		return
+		return err
 	}
 
 	m := new(gmail.Message)
@@ -46,5 +46,8 @@ func (s *EmailImpl) SendOtp(data []byte) {
 
 	if _, err := s.gmailService.Users.Messages.Send("me", m).Do(); err != nil {
 		log.Logger.WithFields(logrus.Fields{"location": "service.EmailImpl/SendOtp", "section": "gmail.Send"}).Error(err)
+		return err
 	}
+
+	return nil
 }

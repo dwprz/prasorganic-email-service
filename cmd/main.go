@@ -6,7 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/dwprz/prasorganic-email-service/src/core/broker"
+	"github.com/dwprz/prasorganic-email-service/src/core/broker/consumer"
+	"github.com/dwprz/prasorganic-email-service/src/core/broker/handler"
 	"github.com/dwprz/prasorganic-email-service/src/infrastructure/oauth"
 	"github.com/dwprz/prasorganic-email-service/src/service"
 )
@@ -28,11 +29,12 @@ func main() {
 	gmailService := oauth.NewGmailService()
 	emailService := service.NewEmail(gmailService)
 
-	rabbitMQClient := broker.NewRabbitMQClient(emailService)
+	otpHandler := handler.NewOtpRabbitMQ(emailService)
+	otpConsumer := consumer.NewOtpRabbitMQ(otpHandler)
 
 	go func() {
-		defer rabbitMQClient.Close()
-		rabbitMQClient.Consume(ctx)
+		defer otpConsumer.Close()
+		otpConsumer.Consume(ctx)
 	}()
 
 	<-ctx.Done()
