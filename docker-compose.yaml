@@ -1,0 +1,29 @@
+services:
+  prasorganic-rabbitmq-email-service:
+    image: rabbitmq:3.13.6-management-alpine
+    container_name: prasorganic-rabbitmq-email-service
+    ports:
+      - 5672:5672     # AMQP Port
+      - 15672:15672     # RabbitMQ Management UI
+      - 15692:15692   # RabbitMQ Prometheus plugin
+    environment:
+      - CONFIG_FILE=/etc/rabbitmq/rabbitmq.conf
+    volumes:
+      - type: bind
+        source: ./conf/rabbitmq.conf
+        target: /etc/rabbitmq/rabbitmq.config
+      - type: volume
+        source: prasorganic-rabbitmq-email-service-data
+        target: /var/lib/rabbitmq
+    networks:
+      - prasorganic-network
+
+volumes:
+  prasorganic-rabbitmq-email-service-data:
+    name: prasorganic-rabbitmq-email-service-data
+    external: true
+
+networks:
+  prasorganic-network:
+    name: prasorganic-network
+    external: true
